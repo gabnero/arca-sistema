@@ -3,228 +3,311 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A.R.C.A. Dashboard v3.0</title>
+    <title>A.R.C.A. | TERMINAL_V3.1</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
         :root {
-            --neon-purple: #8a2be2;
-            --neon-gold: #ffd700;
-            --bg-dark: #0a0a0c;
-            --panel-bg: rgba(20, 20, 25, 0.8);
+            --neon-purple: #9d4edd;
+            --neon-gold: #ff9e00;
+            --bg-black: #050505;
+            --glass: rgba(15, 15, 20, 0.85);
+            --border: rgba(157, 78, 221, 0.4);
         }
+
+        * { box-sizing: border-box; }
 
         body {
-            background-color: var(--bg-dark);
-            color: #e0e0e0;
-            font-family: 'Courier New', Courier, monospace;
+            background-color: var(--bg-black);
+            color: #d0d0d0;
+            font-family: 'Share Tech Mono', monospace;
             margin: 0;
-            overflow: hidden;
-            display: grid;
-            grid-template-columns: 300px 1fr 300px;
-            grid-template-rows: 60px 1fr 200px;
             height: 100vh;
-            gap: 10px;
-            padding: 10px;
-            box-sizing: border-box;
+            display: grid;
+            grid-template-columns: 320px 1fr 320px;
+            grid-template-rows: 50px 1fr 220px;
+            gap: 12px;
+            padding: 12px;
+            overflow: hidden;
+            text-transform: uppercase;
         }
 
-        /* Efeito de scanline de TV antiga */
-        body::before {
-            content: " ";
-            display: block;
-            position: absolute;
-            top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            z-index: 100;
-            background-size: 100% 2px, 3px 100%;
+        /* Efeito de TV Antiga e Glitch */
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            background-size: 100% 3px, 3px 100%;
             pointer-events: none;
+            z-index: 1000;
         }
 
         header {
             grid-column: 1 / 4;
-            background: var(--panel-bg);
-            border: 1px solid var(--neon-purple);
+            background: var(--glass);
+            border: 1px solid var(--border);
             display: flex;
             align-items: center;
-            padding: 0 20px;
+            padding: 0 25px;
             justify-content: space-between;
-            text-shadow: 0 0 10px var(--neon-purple);
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+            animation: flicker 3s infinite;
         }
 
         .panel {
-            background: var(--panel-bg);
-            border: 1px solid rgba(138, 43, 226, 0.3);
-            padding: 15px;
-            overflow-y: auto;
-            backdrop-filter: blur(5px);
-        }
-
-        /* Monitor de Alma (51/49) */
-        .soul-bar-container { margin-bottom: 20px; }
-        .soul-label { font-size: 12px; margin-bottom: 5px; display: block; }
-        .bar-bg { background: #222; height: 15px; border-radius: 10px; overflow: hidden; }
-        .bar-fill { height: 100%; transition: width 2s; }
-        .queen { background: var(--neon-purple); box-shadow: 0 0 10px var(--neon-purple); }
-        .fragments { background: var(--neon-gold); box-shadow: 0 0 10px var(--neon-gold); }
-
-        /* Mapa Estelar Central */
-        #star-map {
-            grid-column: 2;
+            background: var(--glass);
+            border: 1px solid var(--border);
+            padding: 20px;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid var(--neon-purple);
+            backdrop-filter: blur(8px);
             position: relative;
         }
 
-        canvas { width: 100%; height: 100%; cursor: crosshair; }
+        .panel-header {
+            font-size: 14px;
+            color: var(--neon-purple);
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
 
-        /* Terminal Inferior */
-        #terminal {
+        /* Barras de Alma Animadas */
+        .soul-container { margin-bottom: 25px; }
+        .soul-label { font-size: 11px; margin-bottom: 8px; display: block; letter-spacing: 1px; }
+        .bar-outer { background: #1a1a1a; height: 10px; border-radius: 2px; overflow: hidden; border: 1px solid #333; }
+        .bar-inner { height: 100%; width: 0%; transition: width 2s cubic-bezier(0.4, 0, 0.2, 1); }
+        .queen { background: var(--neon-purple); box-shadow: 0 0 15px var(--neon-purple); }
+        .dream { background: var(--neon-gold); box-shadow: 0 0 15px var(--neon-gold); }
+
+        /* Mapa Estelar Central */
+        #main-display {
+            grid-column: 2;
+            border: 1px solid var(--border);
+            background: radial-gradient(circle at center, #100a1a 0%, #050505 100%);
+            position: relative;
+        }
+
+        canvas { width: 100%; height: 100%; opacity: 0.7; }
+
+        .map-overlay {
+            position: absolute;
+            top: 20px; left: 20px;
+            pointer-events: none;
+        }
+
+        /* Terminal */
+        footer {
             grid-column: 1 / 4;
             background: #000;
             border: 1px solid var(--neon-purple);
-            padding: 10px;
-            font-size: 14px;
-            color: #00ff41;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: inset 0 0 20px rgba(138, 77, 221, 0.2);
         }
 
-        #output { height: 130px; overflow-y: auto; margin-bottom: 5px; }
+        #output {
+            flex-grow: 1;
+            overflow-y: auto;
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 10px;
+            color: #00ff41; /* Verde clássico de terminal */
+        }
+
+        .terminal-input-row { display: flex; align-items: center; }
+        .cursor { color: var(--neon-purple); margin-right: 10px; font-weight: bold; }
         input {
             background: transparent;
             border: none;
             color: #00ff41;
-            width: 90%;
-            outline: none;
             font-family: inherit;
+            font-size: 14px;
+            width: 100%;
+            outline: none;
         }
 
-        .highlight { color: var(--neon-gold); }
+        /* Log de Atividades */
+        #activity-log { font-size: 11px; color: #888; overflow-y: auto; }
+        .log-entry { margin-bottom: 8px; border-left: 2px solid var(--border); padding-left: 10px; }
+
+        /* Animações */
+        @keyframes flicker {
+            0% { opacity: 0.97; }
+            5% { opacity: 0.9; }
+            10% { opacity: 0.98; }
+            50% { opacity: 1; }
+            95% { opacity: 0.95; }
+        }
+
+        .highlight { color: var(--neon-gold); text-shadow: 0 0 5px var(--neon-gold); }
+        .critical { color: #ff4d4d; animation: pulse 1s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
     </style>
 </head>
 <body>
 
     <header>
-        <div>SISTEMA A.R.C.A. v3.0 [ONLINE]</div>
-        <div id="clock">09/02/2026 | 11:00:27</div>
-        <div style="color: var(--neon-gold);">STATUS: MEMBRANA INSTÁVEL</div>
+        <div>SYSTEM: A.R.C.A. // KERNEL: 0.9.3-BETA</div>
+        <div id="clock">--/--/---- --:--:--</div>
+        <div class="highlight">LOCALIZAÇÃO: LIMIAR TRANSVERSAL</div>
     </header>
 
     <aside class="panel">
-        <h3>INTEGRIDADE DE ALICE</h3>
-        <div class="soul-bar-container">
-            <span class="soul-label">RAINHA DEMONÍACA (51%)</span>
-            <div class="bar-bg"><div class="bar-fill queen" style="width: 51%;"></div></div>
+        <div class="panel-header"><span>BIO-INTEGRIDADE</span><span>ID: ALICE_00</span></div>
+        
+        <div class="soul-container">
+            <span class="soul-label">RAINHA DEMONÍACA (ESTÁTICO)</span>
+            <div class="bar-outer"><div class="bar-inner queen" id="bar-queen"></div></div>
         </div>
-        <div class="soul-bar-container">
-            <span class="soul-label">FRAGMENTOS RESTANTES (49%)</span>
-            <div class="bar-bg"><div class="bar-fill fragments" style="width: 10%;"></div></div>
+
+        <div class="soul-container">
+            <span class="soul-label">O SONHO MAIS ANTIGO (EVOLUINDO)</span>
+            <div class="bar-outer"><div class="bar-inner dream" id="bar-dream"></div></div>
         </div>
-        <hr style="border: 0.5px solid #333;">
-        <h4>FRAGMENTOS DETECTADOS</h4>
-        <ul style="font-size: 12px; list-style: none; padding: 0;">
-            <li class="highlight">[ ] SONHO MAIS ANTIGO</li>
-            <li>[ ] DIRETORA DO FALSO ATO</li>
-            <li>[ ] PRISIONEIRA DA BANDANA</li>
-        </ul>
+
+        <div style="font-size: 11px; margin-top: 20px;">
+            <p class="highlight">FRAGMENTOS RECUPERADOS:</p>
+            <p id="frag-list">> NENHUM DETECTADO</p>
+        </div>
     </aside>
 
-    <main id="star-map">
-        <div style="position: absolute; top: 10px; left: 10px; font-size: 10px;">VISUALIZADOR ESTELAR - SETOR 01</div>
-        <canvas id="canvasStars"></canvas>
+    <main id="main-display">
+        <div class="map-overlay">
+            <div style="font-size: 18px; color: var(--neon-purple);">MAPA_ESTELAR_SETOR_01</div>
+            <div id="map-status" style="font-size: 10px;">AGUARDANDO SINCRONIA TEMPORAL...</div>
+        </div>
+        <canvas id="starCanvas"></canvas>
     </main>
 
     <aside class="panel">
-        <h3>LOGS GLOBAIS</h3>
-        <div id="logs" style="font-size: 11px; line-height: 1.6;">
-            <p>[14-MAY-2021] Falha elétrica massiva detectada em Natal-RN.</p>
-            <p>[10-FEB-2026] Sincronia de 'Marca' detectada no Miro.</p>
-            <p style="color: red;">[ERROR] A DIRETORA bloqueou o acesso ao Pilar 9.</p>
+        <div class="panel-header"><span>ANOMALIAS_MEMBRANA</span></div>
+        <div id="activity-log">
+            <div class="log-entry">[INFO] MONITORAMENTO GLOBAL INICIADO.</div>
+            <div class="log-entry">[WARN] FISSURA DETECTADA: HIROSHIMA, JP.</div>
+            <div class="log-entry">[WARN] FISSURA DETECTADA: SALÉM, USA.</div>
+            <div class="log-entry">[WARN] FISSURA DETECTADA: CNOSSOS, GR.</div>
         </div>
     </aside>
 
-    <footer id="terminal">
+    <footer>
         <div id="output"></div>
-        <span>> </span><input type="text" id="commandInput" autofocus autocomplete="off">
+        <div class="terminal-input-row">
+            <span class="cursor">></span>
+            <input type="text" id="cmdInput" autofocus spellcheck="false" autocomplete="off">
+        </div>
     </footer>
 
     <script>
-        // Lógica do Relógio
+        // --- CONFIGURAÇÕES DOS ENIGMAS ---
+        const SOLUCOES = {
+            DATA: "14052021",
+            HEROI: "PERSEU",
+            DICAS: {
+                "1": "HIROSHIMA: ONDE O SOL SE APAGOU, A INOCÊNCIA RENASCE NO LIMBO. (CÍRCULO 1)",
+                "2": "SALÉM: A INVEJA CRIOU UM TRIBUNAL DE LAMA. A DIRETORA ESTÁ ASSISTINDO. (CÍRCULO 5)",
+                "3": "CNOSSOS: O LABIRINTO GUARDA A FORÇA DA BANDANA. O CAMINHO É O PROPÓSITO."
+            }
+        };
+
+        // --- RELÓGIO ---
         setInterval(() => {
-            const now = new Date();
-            document.getElementById('clock').innerText = now.toLocaleString();
+            document.getElementById('clock').innerText = new Date().toLocaleString();
         }, 1000);
 
-        // Lógica do Mapa Estelar (Canvas)
-        const canvas = document.getElementById('canvasStars');
+        // --- BARRAS DE ALMA (Animação inicial) ---
+        setTimeout(() => {
+            document.getElementById('bar-queen').style.width = "51%";
+            document.getElementById('bar-dream').style.width = "12%";
+        }, 1000);
+
+        // --- CANVAS (ESTRELAS) ---
+        const canvas = document.getElementById('starCanvas');
         const ctx = canvas.getContext('2d');
         let stars = [];
 
         function initStars() {
             canvas.width = canvas.parentElement.offsetWidth;
             canvas.height = canvas.parentElement.offsetHeight;
-            for(let i=0; i<100; i++) {
-                stars.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
-                    size: Math.random() * 2,
-                    opacity: Math.random()
-                });
+            for(let i=0; i<150; i++) {
+                stars.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, s: Math.random()*2, o: Math.random() });
             }
         }
-
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = "white";
-            stars.forEach(s => {
-                ctx.globalAlpha = s.opacity;
+        function drawStars() {
+            ctx.clearRect(0,0,canvas.width, canvas.height);
+            ctx.fillStyle = "#fff";
+            stars.forEach(st => {
+                ctx.globalAlpha = st.o;
                 ctx.beginPath();
-                ctx.arc(s.x, s.y, s.size, 0, Math.PI*2);
+                ctx.arc(st.x, st.y, st.s, 0, Math.PI*2);
                 ctx.fill();
             });
-            requestAnimationFrame(draw);
+            requestAnimationFrame(drawStars);
         }
-        initStars();
-        draw();
+        initStars(); drawStars();
 
-        // Lógica do Terminal
+        // --- TERMINAL ---
         const output = document.getElementById('output');
-        const input = document.getElementById('commandInput');
+        const input = document.getElementById('cmdInput');
 
-        const print = (txt, color = "#00ff41") => {
-            const p = document.createElement('p');
-            p.style.color = color;
-            p.innerHTML = txt;
+        function print(text, type = "default") {
+            const p = document.createElement('div');
+            if(type === "error") p.className = "critical";
+            if(type === "hint") p.className = "highlight";
+            p.innerHTML = text;
             output.appendChild(p);
             output.scrollTop = output.scrollHeight;
-        };
+        }
 
-        print("A.R.C.A. v3.0 inicializado. Digite 'HELP' para comandos.");
+        print("A.R.C.A. DASHBOARD [VERSÃO 3.1] - BEM-VINDO, MARCADO.");
+        print("DIGITE 'HELP' PARA LISTAR PROTOCOLOS DISPONÍVEIS.");
 
         input.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
-                const cmd = input.value.toUpperCase();
-                print("> " + cmd, "white");
+                const val = input.value.toUpperCase().trim();
+                print(`<span style="color:#aaa;">> ${val}</span>`);
                 input.value = "";
 
-                switch(cmd) {
+                switch(val) {
                     case "HELP":
-                        print("Comandos: LS, ANALISAR, RITUAL, CLEAR");
+                        print("COMANDOS: ANALISAR, SYNC_SKY [DATA], DICA [1-3], CLEAR");
                         break;
-                    case "LS":
-                        print("ARQUIVOS: frag_sonho.dna, pilar_9.lock, carcosa.map");
-                        break;
-                    case "RITUAL":
-                        print("ERRO: Escolha 'ARROGÂNCIA' detectada. Sincronia falhou.", "red");
-                        break;
+                    
                     case "ANALISAR":
-                        print("Estrelas em 14/05/2021: ALINHAMENTO DE TRAIÇÃO DETECTADO.");
+                        print("Rastreando fragmentos históricos...");
+                        print("- SINAL_01: JP (34.44, 132.45) - INOCÊNCIA DETECTADA.");
+                        print("- SINAL_02: USA (42.51, -70.89) - RAIVA DETECTADA.");
+                        print("- SINAL_03: GR (35.29, 25.16) - FORÇA DETECTADA.");
                         break;
-                    case "CLEAR":
-                        output.innerHTML = "";
+
+                    case "DICA 1": print(SOLUCOES.DICAS["1"], "hint"); break;
+                    case "DICA 2": print(SOLUCOES.DICAS["2"], "hint"); break;
+                    case "DICA 3": print(SOLUCOES.DICAS["3"], "hint"); break;
+
+                    case "SYNC_SKY 14052021":
+                        print("SINCRONIA TEMPORAL ESTABELECIDA!", "hint");
+                        document.getElementById('map-status').innerText = "DATA: 14/05/2021 | CONSTELAÇÃO: CASSIOPEIA DETECTADA";
+                        document.getElementById('map-status').style.color = "var(--neon-gold)";
+                        print("MAPA ATUALIZADO. IDENTIFIQUE O HERÓI PARA LIBERAR OS 49%.");
                         break;
+
+                    case "PERSEU":
+                        print("VEREDICTO ACEITO. O SONHO ESTÁ NASCENDO.", "hint");
+                        document.getElementById('bar-dream').style.width = "49%";
+                        document.getElementById('frag-list').innerHTML = "> SONHO MAIS ANTIGO [ATIVO]<br>> PRISIONEIRA [ATIVO]<br>> DIRETORA [LOCALIZADA]";
+                        print("ACESSO À ILHA DE SANTA JOANA: HABILITADO NO RPG.", "hint");
+                        break;
+
+                    case "CLEAR": output.innerHTML = ""; break;
+                    
                     default:
-                        print("Comando desconhecido.");
+                        if(val.startsWith("SYNC_SKY")) print("ERRO: DATA INCORRETA OU FORMATO INVÁLIDO.", "error");
+                        else print("COMANDO NÃO RECONHECIDO.");
                 }
             }
         });
