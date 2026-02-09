@@ -3,314 +3,410 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A.R.C.A. | TERMINAL_V3.1</title>
-    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <title>A.R.C.A. | PROTOCOLO_AQUERONTE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Special+Elite&family=Rubik+Glitch&display=swap" rel="stylesheet">
     <style>
         :root {
             --neon-purple: #9d4edd;
             --neon-gold: #ff9e00;
-            --bg-black: #050505;
-            --glass: rgba(15, 15, 20, 0.85);
-            --border: rgba(157, 78, 221, 0.4);
+            --bg-deep: #050508;
+            --glass-panel: rgba(20, 20, 30, 0.9);
+            --border-color: rgba(157, 78, 221, 0.4);
+            --error-red: #ff3333;
+            --terminal-green: #00ff41;
+            --terminal-dim: #008f11;
         }
 
         * { box-sizing: border-box; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #000; }
+        ::-webkit-scrollbar-thumb { background: var(--neon-purple); border-radius: 3px; }
 
         body {
-            background-color: var(--bg-black);
-            color: #d0d0d0;
+            background-color: var(--bg-deep);
+            color: #e0e0e0;
             font-family: 'Share Tech Mono', monospace;
-            margin: 0;
-            height: 100vh;
+            margin: 0; height: 100vh; overflow: hidden;
             display: grid;
+            grid-template-areas: "header header header" "left main right" "footer footer footer";
             grid-template-columns: 320px 1fr 320px;
-            grid-template-rows: 50px 1fr 220px;
-            gap: 12px;
-            padding: 12px;
-            overflow: hidden;
+            grid-template-rows: 60px 1fr 280px;
+            gap: 15px; padding: 15px;
             text-transform: uppercase;
+            transition: all 1s ease;
         }
 
-        /* Efeito de TV Antiga e Glitch */
+        /* Efeitos de Fundo */
+        body::before {
+            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
+            background-size: 100% 4px; pointer-events: none; z-index: 900;
+        }
         body::after {
-            content: "";
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), 
-                        linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
-            background-size: 100% 3px, 3px 100%;
-            pointer-events: none;
-            z-index: 1000;
+            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle, rgba(0,0,0,0) 60%, rgba(0,0,0,0.8) 100%);
+            pointer-events: none; z-index: 900;
         }
 
+        /* --- ESTRUTURA --- */
         header {
-            grid-column: 1 / 4;
-            background: var(--glass);
-            border: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            padding: 0 25px;
-            justify-content: space-between;
-            box-shadow: 0 0 15px rgba(0,0,0,0.5);
-            animation: flicker 3s infinite;
+            grid-area: header; background: var(--glass-panel); border: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: space-between; padding: 0 30px;
+            box-shadow: 0 0 20px rgba(157, 78, 221, 0.15); backdrop-filter: blur(10px); z-index: 10;
         }
 
         .panel {
-            background: var(--glass);
-            border: 1px solid var(--border);
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            backdrop-filter: blur(8px);
-            position: relative;
+            background: var(--glass-panel); border: 1px solid var(--border-color); padding: 20px;
+            display: flex; flex-direction: column; backdrop-filter: blur(12px); position: relative; z-index: 10;
+        }
+        .panel-left { grid-area: left; }
+        .panel-right { grid-area: right; }
+
+        .panel-title {
+            color: var(--neon-purple); font-size: 14px; letter-spacing: 2px;
+            border-bottom: 1px solid rgba(157, 78, 221, 0.3); padding-bottom: 10px; margin-bottom: 20px;
         }
 
-        .panel-header {
-            font-size: 14px;
-            color: var(--neon-purple);
-            margin-bottom: 15px;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 5px;
-            display: flex;
-            justify-content: space-between;
-        }
+        /* Barras */
+        .soul-metric { margin-bottom: 25px; }
+        .soul-info { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 5px; color: #aaa; }
+        .bar-track { background: rgba(0,0,0,0.5); height: 10px; border: 1px solid #333; overflow: hidden; }
+        .bar-fill { height: 100%; width: 0%; transition: width 1.5s cubic-bezier(0.25, 1, 0.5, 1); position: relative; }
+        .fill-queen { background: var(--neon-purple); box-shadow: 0 0 15px var(--neon-purple); }
+        .fill-dream { background: var(--neon-gold); box-shadow: 0 0 15px var(--neon-gold); }
 
-        /* Barras de Alma Animadas */
-        .soul-container { margin-bottom: 25px; }
-        .soul-label { font-size: 11px; margin-bottom: 8px; display: block; letter-spacing: 1px; }
-        .bar-outer { background: #1a1a1a; height: 10px; border-radius: 2px; overflow: hidden; border: 1px solid #333; }
-        .bar-inner { height: 100%; width: 0%; transition: width 2s cubic-bezier(0.4, 0, 0.2, 1); }
-        .queen { background: var(--neon-purple); box-shadow: 0 0 15px var(--neon-purple); }
-        .dream { background: var(--neon-gold); box-shadow: 0 0 15px var(--neon-gold); }
+        /* Checklist */
+        .task-list { list-style: none; padding: 0; margin: 0; }
+        .task-item { margin-bottom: 12px; display: flex; align-items: center; opacity: 0.4; transition: all 0.5s; font-size: 12px; }
+        .task-item.active { opacity: 1; color: var(--neon-gold); text-shadow: 0 0 8px var(--neon-gold); transform: translateX(5px); }
+        .task-item.done { opacity: 0.7; color: var(--terminal-green); text-decoration: line-through; transform: translateX(0); }
+        .checkbox { width: 14px; height: 14px; border: 1px solid var(--border-color); margin-right: 12px; display: grid; place-items: center; }
+        .task-item.done .checkbox::before { content: "✔"; font-size: 12px; color: var(--terminal-green); }
 
-        /* Mapa Estelar Central */
+        /* Mapa Central */
         #main-display {
-            grid-column: 2;
-            border: 1px solid var(--border);
-            background: radial-gradient(circle at center, #100a1a 0%, #050505 100%);
-            position: relative;
+            grid-area: main; border: 1px solid var(--border-color);
+            background: radial-gradient(circle at center, #1a0b2e 0%, #000 100%);
+            position: relative; box-shadow: inset 0 0 50px rgba(0,0,0,0.8); z-index: 10;
         }
-
-        canvas { width: 100%; height: 100%; opacity: 0.7; }
-
-        .map-overlay {
-            position: absolute;
-            top: 20px; left: 20px;
-            pointer-events: none;
-        }
+        canvas { width: 100%; height: 100%; }
+        .display-overlay { position: absolute; top: 20px; left: 20px; pointer-events: none; }
 
         /* Terminal */
         footer {
-            grid-column: 1 / 4;
-            background: #000;
-            border: 1px solid var(--neon-purple);
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            box-shadow: inset 0 0 20px rgba(138, 77, 221, 0.2);
+            grid-area: footer; background: #020202; border: 1px solid var(--neon-purple);
+            padding: 20px; display: flex; flex-direction: column; box-shadow: 0 0 15px rgba(0,0,0,0.5); z-index: 10;
         }
+        #terminal-output { flex-grow: 1; overflow-y: auto; font-size: 14px; line-height: 1.6; margin-bottom: 10px; color: var(--terminal-green); }
+        .input-area { display: flex; align-items: center; border-top: 1px solid #333; padding-top: 10px; }
+        input { background: transparent; border: none; color: var(--terminal-green); font-family: inherit; font-size: 16px; width: 100%; outline: none; text-shadow: 0 0 5px var(--terminal-green); }
 
-        #output {
-            flex-grow: 1;
-            overflow-y: auto;
-            font-size: 13px;
-            line-height: 1.5;
-            margin-bottom: 10px;
-            color: #00ff41; /* Verde clássico de terminal */
-        }
-
-        .terminal-input-row { display: flex; align-items: center; }
-        .cursor { color: var(--neon-purple); margin-right: 10px; font-weight: bold; }
-        input {
-            background: transparent;
-            border: none;
-            color: #00ff41;
-            font-family: inherit;
-            font-size: 14px;
-            width: 100%;
-            outline: none;
-        }
-
-        /* Log de Atividades */
-        #activity-log { font-size: 11px; color: #888; overflow-y: auto; }
-        .log-entry { margin-bottom: 8px; border-left: 2px solid var(--border); padding-left: 10px; }
+        /* Helpers */
+        .text-purple { color: var(--neon-purple); }
+        .text-gold { color: var(--neon-gold); text-shadow: 0 0 5px var(--neon-gold); }
+        .text-green { color: var(--terminal-green); }
+        .text-red { color: var(--error-red); text-shadow: 0 0 8px var(--error-red); }
+        .text-dim { color: #555; }
+        img { max-width: 100%; border: 1px solid var(--neon-purple); margin: 10px 0; opacity: 0.9; }
 
         /* Animações */
-        @keyframes flicker {
-            0% { opacity: 0.97; }
-            5% { opacity: 0.9; }
-            10% { opacity: 0.98; }
-            50% { opacity: 1; }
-            95% { opacity: 0.95; }
+        .shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shake { 10%, 90% { transform: translate3d(-2px, 0, 0); } 20%, 80% { transform: translate3d(4px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-6px, 0, 0); } 40%, 60% { transform: translate3d(6px, 0, 0); } }
+        .system-failure { animation: glitch-skew 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both infinite; filter: hue-rotate(90deg) contrast(1.5); }
+        @keyframes glitch-skew { 0% { transform: translate(0); } 20% { transform: translate(-2px, 2px); } 40% { transform: translate(-2px, -2px); } 60% { transform: translate(2px, 2px); } 80% { transform: translate(2px, -2px); } 100% { transform: translate(0); } }
+
+        /* Cutscene Overlays */
+        #cinematic-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 2000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: opacity 2s;
+        }
+        .cinematic-text {
+            font-family: 'Special Elite', cursive; 
+            color: #fff; font-size: 26px; text-align: center; max-width: 800px;
+            text-shadow: 0 0 10px var(--neon-purple);
+            opacity: 0; transform: translateY(20px); transition: all 1s;
+            position: absolute; 
         }
 
-        .highlight { color: var(--neon-gold); text-shadow: 0 0 5px var(--neon-gold); }
-        .critical { color: #ff4d4d; animation: pulse 1s infinite; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        #end-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #050000; z-index: 3000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: opacity 3s;
+        }
+        .rpg-title {
+            font-family: 'Rubik Glitch', cursive; 
+            font-size: 70px; color: #b30000;
+            text-shadow: 4px 4px 0px #000, 0 0 30px #ff0000;
+            letter-spacing: 5px; margin: 0;
+            animation: pulse-title 3s infinite;
+        }
+        .rpg-subtitle {
+            font-family: 'Special Elite', monospace;
+            font-size: 24px; color: #888; margin-top: 10px;
+            letter-spacing: 3px; border-top: 1px solid #333; padding-top: 10px;
+        }
+        .occult-symbol {
+            position: absolute; width: 600px; height: 600px;
+            border: 1px dashed rgba(255, 0, 0, 0.2); border-radius: 50%;
+            animation: spin 20s linear infinite; pointer-events: none;
+        }
+        .occult-symbol::before {
+            content: ""; position: absolute; top: 10%; left: 10%; width: 80%; height: 80%;
+            border: 1px solid rgba(255, 0, 0, 0.1); transform: rotate(45deg);
+        }
 
+        @keyframes pulse-title { 0%, 100% { opacity: 1; } 50% { opacity: 0.8; text-shadow: 0 0 10px #500; } }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
-<body>
+<body id="body-root">
 
     <header>
-        <div>SYSTEM: A.R.C.A. // KERNEL: 0.9.3-BETA</div>
-        <div id="clock">--/--/---- --:--:--</div>
-        <div class="highlight">LOCALIZAÇÃO: LIMIAR TRANSVERSAL</div>
+        <div style="font-size: 20px; font-weight: bold; letter-spacing: 4px;">
+            A.R.C.A. <span style="font-size: 12px; color: var(--neon-purple); vertical-align: middle;">SYSTEM_V4.4</span>
+        </div>
+        <div id="clock" class="text-purple">--:--:--</div>
+        <div class="text-gold" style="font-size: 12px;">CONEXÃO: ATIVA</div>
     </header>
 
-    <aside class="panel">
-        <div class="panel-header"><span>BIO-INTEGRIDADE</span><span>ID: ALICE_00</span></div>
-        
-        <div class="soul-container">
-            <span class="soul-label">RAINHA DEMONÍACA (ESTÁTICO)</span>
-            <div class="bar-outer"><div class="bar-inner queen" id="bar-queen"></div></div>
+    <aside class="panel panel-left">
+        <div class="panel-title">BIO_DATA // ALICE</div>
+        <div class="soul-metric">
+            <div class="soul-info"><span>RAINHA (PRISÃO)</span><span id="queen-val">51%</span></div>
+            <div class="bar-track"><div class="bar-fill fill-queen" id="bar-queen"></div></div>
         </div>
-
-        <div class="soul-container">
-            <span class="soul-label">O SONHO MAIS ANTIGO (EVOLUINDO)</span>
-            <div class="bar-outer"><div class="bar-inner dream" id="bar-dream"></div></div>
+        <div class="soul-metric">
+            <div class="soul-info"><span>FRAGMENTOS (DESPERTANDO)</span><span id="dream-val">10%</span></div>
+            <div class="bar-track"><div class="bar-fill fill-dream" id="bar-dream"></div></div>
         </div>
-
-        <div style="font-size: 11px; margin-top: 20px;">
-            <p class="highlight">FRAGMENTOS RECUPERADOS:</p>
-            <p id="frag-list">> NENHUM DETECTADO</p>
+        <div style="margin-top: auto; font-size: 11px; color: #666; border-top: 1px solid #333; padding-top: 10px;">
+            <p>> DETECTANDO ANOMALIAS GLOBAIS...</p>
+            <p>> AGUARDANDO COMANDOS...</p>
         </div>
     </aside>
 
     <main id="main-display">
-        <div class="map-overlay">
-            <div style="font-size: 18px; color: var(--neon-purple);">MAPA_ESTELAR_SETOR_01</div>
-            <div id="map-status" style="font-size: 10px;">AGUARDANDO SINCRONIA TEMPORAL...</div>
+        <div class="display-overlay">
+            <div class="text-purple" style="font-size: 18px; letter-spacing: 2px;">VISUALIZADOR_DO_VAZIO</div>
+            <div id="map-feedback" class="text-green" style="font-size: 10px; margin-top: 5px;">SCANNER: ATIVO</div>
         </div>
         <canvas id="starCanvas"></canvas>
     </main>
 
-    <aside class="panel">
-        <div class="panel-header"><span>ANOMALIAS_MEMBRANA</span></div>
-        <div id="activity-log">
-            <div class="log-entry">[INFO] MONITORAMENTO GLOBAL INICIADO.</div>
-            <div class="log-entry">[WARN] FISSURA DETECTADA: HIROSHIMA, JP.</div>
-            <div class="log-entry">[WARN] FISSURA DETECTADA: SALÉM, USA.</div>
-            <div class="log-entry">[WARN] FISSURA DETECTADA: CNOSSOS, GR.</div>
-        </div>
+    <aside class="panel panel-right">
+        <div class="panel-title">PROTOCOLO_DE_RESGATE</div>
+        <ul class="task-list">
+            <li class="task-item active" id="task1"><span class="checkbox"></span>ESTABILIZAR 3 FRAGMENTOS</li>
+            <li class="task-item" id="task2"><span class="checkbox"></span>SINCRONIA ESTELAR (CLARÃO)</li>
+            <li class="task-item" id="task3"><span class="checkbox"></span>ROMPER O SELO DO TRONO</li>
+            <li class="task-item" id="task4"><span class="checkbox"></span>DESMASCARAR O USURPADOR</li>
+            <li class="task-item" id="task5"><span class="checkbox"></span>REVELAÇÃO FINAL</li>
+        </ul>
     </aside>
 
     <footer>
-        <div id="output"></div>
-        <div class="terminal-input-row">
-            <span class="cursor">></span>
-            <input type="text" id="cmdInput" autofocus spellcheck="false" autocomplete="off">
+        <div id="terminal-output"></div>
+        <div class="input-area">
+            <span class="text-purple" style="margin-right: 15px; font-weight: bold;">[MARCADO]></span>
+            <input type="text" id="cmdInput" autofocus autocomplete="off" spellcheck="false">
         </div>
     </footer>
 
+    <div id="cinematic-overlay">
+        <div id="msg-1" class="cinematic-text">"Obrigada, Marcados. Finalmente posso nascer em meio ao caos."</div>
+        <div id="msg-2" class="cinematic-text">"Mas aquela que nos salvará, a Rainha Demoníaca..."</div>
+        <div id="msg-3" class="cinematic-text">"...ainda aguarda no Reino da Prisão."</div>
+        <div id="msg-4" class="cinematic-text" style="color: var(--neon-gold);">"Encontrem a chave da Prisioneira em Santa Joana. Estarei esperando."</div>
+    </div>
+
+    <div id="end-screen">
+        <div class="occult-symbol"></div>
+        <div class="cinematic-text" style="opacity: 1; margin-bottom: 60px; position: relative;">Mas essa história, continua naquele lugar...</div>
+        <h1 class="rpg-title">ORDEM PARANORMAL</h1>
+        <div class="rpg-subtitle">PROTOCOLO: AQUERONTE</div>
+    </div>
+
     <script>
-        // --- CONFIGURAÇÕES DOS ENIGMAS ---
-        const SOLUCOES = {
-            DATA: "14052021",
-            HEROI: "PERSEU",
-            DICAS: {
-                "1": "HIROSHIMA: ONDE O SOL SE APAGOU, A INOCÊNCIA RENASCE NO LIMBO. (CÍRCULO 1)",
-                "2": "SALÉM: A INVEJA CRIOU UM TRIBUNAL DE LAMA. A DIRETORA ESTÁ ASSISTINDO. (CÍRCULO 5)",
-                "3": "CNOSSOS: O LABIRINTO GUARDA A FORÇA DA BANDANA. O CAMINHO É O PROPÓSITO."
-            }
-        };
-
-        // --- RELÓGIO ---
-        setInterval(() => {
-            document.getElementById('clock').innerText = new Date().toLocaleString();
-        }, 1000);
-
-        // --- BARRAS DE ALMA (Animação inicial) ---
+        // SETUP
+        setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString(); }, 1000);
         setTimeout(() => {
             document.getElementById('bar-queen').style.width = "51%";
-            document.getElementById('bar-dream').style.width = "12%";
+            document.getElementById('bar-dream').style.width = "10%";
         }, 1000);
 
-        // --- CANVAS (ESTRELAS) ---
+        // CANVAS
         const canvas = document.getElementById('starCanvas');
         const ctx = canvas.getContext('2d');
-        let stars = [];
+        let stars = [], showW = false;
 
+        function resizeCanvas() { canvas.width = canvas.parentElement.offsetWidth; canvas.height = canvas.parentElement.offsetHeight; initStars(); }
         function initStars() {
-            canvas.width = canvas.parentElement.offsetWidth;
-            canvas.height = canvas.parentElement.offsetHeight;
-            for(let i=0; i<150; i++) {
-                stars.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, s: Math.random()*2, o: Math.random() });
-            }
+            stars = [];
+            for(let i=0; i<250; i++) stars.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, size: Math.random()*2, opacity: Math.random(), speed: Math.random()*0.05 });
         }
-        function drawStars() {
-            ctx.clearRect(0,0,canvas.width, canvas.height);
-            ctx.fillStyle = "#fff";
-            stars.forEach(st => {
-                ctx.globalAlpha = st.o;
+        function draw() {
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            stars.forEach(s => { ctx.globalAlpha=s.opacity; ctx.fillStyle="white"; ctx.beginPath(); ctx.arc(s.x,s.y,s.size,0,Math.PI*2); ctx.fill(); s.y-=s.speed; if(s.y<0)s.y=canvas.height; });
+            if(showW) {
+                ctx.globalAlpha=1; ctx.strokeStyle="var(--neon-gold)"; ctx.lineWidth=3; ctx.shadowBlur=15; ctx.shadowColor="var(--neon-gold)";
                 ctx.beginPath();
-                ctx.arc(st.x, st.y, st.s, 0, Math.PI*2);
-                ctx.fill();
-            });
-            requestAnimationFrame(drawStars);
+                const pts = [{x:0.25,y:0.3}, {x:0.35,y:0.6}, {x:0.5,y:0.35}, {x:0.65,y:0.6}, {x:0.75,y:0.3}];
+                pts.forEach((p,i)=>{ const px=p.x*canvas.width, py=p.y*canvas.height; if(i===0)ctx.moveTo(px,py); else ctx.lineTo(px,py); });
+                ctx.stroke();
+                pts.forEach(p => { ctx.fillStyle="var(--neon-gold)"; ctx.beginPath(); ctx.arc(p.x*canvas.width, p.y*canvas.height, 5, 0, Math.PI*2); ctx.fill(); });
+                ctx.shadowBlur=0;
+            }
+            requestAnimationFrame(draw);
         }
-        initStars(); drawStars();
+        window.addEventListener('resize', resizeCanvas); resizeCanvas(); draw();
 
-        // --- TERMINAL ---
-        const output = document.getElementById('output');
+        // TERMINAL LOGIC
+        const output = document.getElementById('terminal-output');
         const input = document.getElementById('cmdInput');
+        const body = document.getElementById('body-root');
+        let currentStep = 1; vinculados = 0;
 
-        function print(text, type = "default") {
-            const p = document.createElement('div');
-            if(type === "error") p.className = "critical";
-            if(type === "hint") p.className = "highlight";
-            p.innerHTML = text;
-            output.appendChild(p);
-            output.scrollTop = output.scrollHeight;
+        function print(text, className = "text-green") {
+            const p = document.createElement('div'); p.className = className; p.style.marginBottom = "5px"; p.innerHTML = text;
+            output.appendChild(p); output.scrollTop = output.scrollHeight;
         }
 
-        print("A.R.C.A. DASHBOARD [VERSÃO 3.1] - BEM-VINDO, MARCADO.");
-        print("DIGITE 'HELP' PARA LISTAR PROTOCOLOS DISPONÍVEIS.");
+        print("INICIALIZANDO KERNEL A.R.C.A. v4.4...", "text-purple");
+        setTimeout(() => print("SISTEMA ONLINE. DIGITE 'HELP'.", "text-green"), 500);
+
+        function updateTask(taskId, nextTaskId) {
+            const current = document.getElementById(taskId); current.classList.remove('active'); current.classList.add('done');
+            if(nextTaskId) { document.getElementById(nextTaskId).classList.add('active'); currentStep++; }
+        }
 
         input.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 const val = input.value.toUpperCase().trim();
-                print(`<span style="color:#aaa;">> ${val}</span>`);
-                input.value = "";
+                print(`> ${val}`, "text-dim"); input.value = "";
 
-                switch(val) {
-                    case "HELP":
-                        print("COMANDOS: ANALISAR, SYNC_SKY [DATA], DICA [1-3], CLEAR");
-                        break;
-                    
-                    case "ANALISAR":
-                        print("Rastreando fragmentos históricos...");
-                        print("- SINAL_01: JP (34.44, 132.45) - INOCÊNCIA DETECTADA.");
-                        print("- SINAL_02: USA (42.51, -70.89) - RAIVA DETECTADA.");
-                        print("- SINAL_03: GR (35.29, 25.16) - FORÇA DETECTADA.");
-                        break;
-
-                    case "DICA 1": print(SOLUCOES.DICAS["1"], "hint"); break;
-                    case "DICA 2": print(SOLUCOES.DICAS["2"], "hint"); break;
-                    case "DICA 3": print(SOLUCOES.DICAS["3"], "hint"); break;
-
-                    case "SYNC_SKY 14-05-2021":
-                        print("SINCRONIA TEMPORAL ESTABELECIDA!", "hint");
-                        document.getElementById('map-status').innerText = "DATA: 14/05/2021 | CONSTELAÇÃO: CASSIOPEIA DETECTADA";
-                        document.getElementById('map-status').style.color = "var(--neon-gold)";
-                        print("MAPA ATUALIZADO. IDENTIFIQUE O HERÓI PARA LIBERAR OS 49%.");
-                        break;
-
-                    case "PERSEU":
-                        print("VEREDICTO ACEITO. O SONHO ESTÁ NASCENDO.", "hint");
-                        document.getElementById('bar-dream').style.width = "49%";
-                        document.getElementById('frag-list').innerHTML = "> SONHO MAIS ANTIGO [ATIVO]<br>> PRISIONEIRA [ATIVO]<br>> DIRETORA [LOCALIZADA]";
-                        print("ACESSO À ILHA DE SANTA JOANA: HABILITADO NO RPG.", "hint");
-                        break;
-
-                    case "CLEAR": output.innerHTML = ""; break;
-                    
-                    default:
-                        if(val.startsWith("SYNC_SKY")) print("ERRO: DATA INCORRETA OU FORMATO INVÁLIDO.", "error");
-                        else print("COMANDO NÃO RECONHECIDO.");
+                // --- MENU HELP ATUALIZADO (PERSEU OCULTO) ---
+                if (val === "HELP") {
+                    print("PROTOCOLOS DE INVESTIGAÇÃO:", "text-gold");
+                    print(" • ANALISAR: Mapear anomalias geográficas.");
+                    print(" • VISUALIZAR_MAPA: Projetar Arquitetura do Reino.");
+                    print(" • DICA [1-3]: Consulta o buffer dos fragmentos.");
+                    print(" • VINCULAR [NOME] [CÍRCULO]: Estabilizar fragmentos.");
+                    print(" • SYNC_SKY [DATA]: Sincronia temporal.");
+                    print(" • DENUNCIAR [NOME]: Protocolo de Acusação.");
+                    print(" • REVELACAO FINAL: Executar Última Mensagem.");
                 }
+                
+                else if (val === "ANALISAR") {
+                    print("RASTREANDO FISSURAS GLOBAIS...", "text-gold");
+                    print("1. [34.395553823852616, 132.45361345767162] - Sinal de ?????");
+                    print("2. [42.51779555771788, -70.90863871958511] - Sinal de ????????");
+                    print("3. [35.298057598852566, 25.162792228836395] - Sinal de ???????????");
+                }
+
+                else if (val === "VISUALIZAR_MAPA") {
+                    print("CARREGANDO ARQUIVO DE REFERÊNCIA...", "text-gold");
+                    print("<img src='mapa_dante.jpg' alt='[ERRO: ARQUIVO NÃO ENCONTRADO NO GITHUB]'>");
+                }
+
+                else if (val.startsWith("DICA")) {
+                    if (val.includes("1")) print("DICA: Uma é apenas a Luz que nasce no Nada, um vazio.", "text-purple");
+                    if (val.includes("2")) print("DICA: No final, ao habitar um corpo que não é seu, você é apenas uma...", "text-purple");
+                    if (val.includes("3")) print("DICA: No Labirinto do guerreiro, o ultimo circulo necessário nasce, pois é impossivel ganhar do minotauro sem...", "text-purple");
+                }
+
+                else if (val.startsWith("VINCULAR")) {
+                    if (val === "VINCULAR SONHO LIMBO" || val === "VINCULAR DIRETORA FRAUDE" || val === "VINCULAR PRISIONEIRA VIOLENCIA") {
+                        print("FRAGMENTO ESTABILIZADO.", "text-gold");
+                        vinculados++;
+                        let p = 10 + (vinculados * 13);
+                        document.getElementById('bar-dream').style.width = p + "%";
+                        document.getElementById('dream-val').innerText = p + "%";
+                        if (vinculados === 3) {
+                            print("FRAGMENTOS LOCALIZADOS.", "text-green");
+                            print("ALERTA: VISÃO OBLITERADA POR BLOQUEIO CELESTE.", "text-red");
+                            print("DICA: SINCRONIZE O CÉU DO DIA DO CLARÃO.", "text-purple");
+                            updateTask('task1', 'task2');
+                        }
+                    } else { print("ERRO: PARÂMETROS INCORRETOS.", "text-red"); }
+                }
+
+                else if (val === "SYNC_SKY 14052021") {
+                    if (currentStep < 2) print("ACESSO NEGADO: VINCULE OS FRAGMENTOS PRIMEIRO.", "text-red");
+                    else {
+                        showW = true;
+                        print("SINCRONIA TEMPORAL: 14/05/2021 [OK]", "text-gold");
+                        print("CONSTELAÇÃO DETECTADA: CASSIOPEIA.", "text-gold");
+                        document.getElementById('map-feedback').innerText = "ALVO: CASSIOPEIA";
+                        print("QUESTÃO: QUEM É QUE SALVA A CONSTELAÇÃO MENOR?", "text-purple");
+                        updateTask('task2', 'task3');
+                    }
+                }
+
+                // --- COMANDO OCULTO (RESPOSTA DO ENIGMA) ---
+                else if (val === "PERSEU") {
+                    if (currentStep < 3) print("ACESSO NEGADO: REQUER SINCRONIA ESTELAR.", "text-red");
+                    else {
+                        print("O SELO FOI ROMPIDO. O TRONO CAIU.", "text-green");
+                        print("ARQUIVO DE IDENTIDADE DESBLOQUEADO:", "text-gold");
+                        print("<span style='background:#333; color:#fff; padding:2px;'>RGFuaWVsIOkgbyBUcmFpZG9y</span>", "text-green");
+                        print("DICA: DECODIFIQUE PARA IDENTIFICAR O USURPADOR. (USE O PROTOCOLO DE ACUSAÇÃO)", "text-purple");
+                        updateTask('task3', 'task4');
+                    }
+                }
+
+                else if (val === "DENUNCIAR DIRETORA") {
+                    if (currentStep < 4) print("ACESSO NEGADO: IDENTIDADE NÃO CONFIRMADA.", "text-red");
+                    else {
+                        body.classList.add('shake');
+                        setTimeout(() => body.classList.remove('shake'), 600);
+                        print("!!! ALERTA DE SISTEMA !!!", "text-red");
+                        print("A MÁSCARA CAIU. IDENTIDADE CONFIRMADA: DANIEL.", "text-red");
+                        print("AVISO: O CULTO AO IMPOSSÍVEL PROTEGE ESTE USUÁRIO.", "text-purple");
+                        print("ELE PERMANECE NO SISTEMA COMO 'DIRETORA DO FALSO ATO'.", "text-dim");
+                        body.style.backgroundColor = "#1a0505"; 
+                        updateTask('task4', 'task5');
+                        print("O SISTEMA ESTÁ ENTRANDO EM COLAPSO. EXECUTE 'REVELACAO FINAL'.", "text-gold");
+                    }
+                }
+
+                else if (val === "REVELACAO FINAL") {
+                    if (currentStep < 5) print("ACESSO NEGADO.", "text-red");
+                    else {
+                        print("INICIANDO PROTOCOLO DE TRANSMISSÃO NEURAL...", "text-gold");
+                        document.getElementById('bar-dream').style.width = "49%";
+                        document.getElementById('dream-val').innerText = "49%";
+                        updateTask('task5', null);
+                        input.disabled = true;
+                        setTimeout(startCinematicSequence, 1000);
+                    }
+                }
+                else { print("COMANDO NÃO RECONHECIDO.", "text-red"); }
             }
         });
+
+        // --- SISTEMA DE CUTSCENE ---
+        function startCinematicSequence() {
+            document.body.classList.add('system-failure');
+            const overlay = document.getElementById('cinematic-overlay');
+            overlay.style.opacity = "1"; overlay.style.pointerEvents = "all";
+
+            setTimeout(() => showMsg('msg-1'), 1500);
+            setTimeout(() => { hideMsg('msg-1'); showMsg('msg-2'); }, 5500);
+            setTimeout(() => { hideMsg('msg-2'); showMsg('msg-3'); }, 9500);
+            setTimeout(() => { hideMsg('msg-3'); showMsg('msg-4'); }, 13500);
+            
+            setTimeout(() => {
+                hideMsg('msg-4');
+                document.getElementById('end-screen').style.opacity = "1";
+                document.getElementById('end-screen').style.pointerEvents = "all";
+                document.body.classList.remove('system-failure'); 
+            }, 18000);
+        }
+        function showMsg(id) { const el = document.getElementById(id); el.style.opacity = "1"; el.style.transform = "translateY(0)"; }
+        function hideMsg(id) { const el = document.getElementById(id); el.style.opacity = "0"; el.style.transform = "translateY(-20px)"; }
     </script>
 </body>
 </html>
