@@ -312,13 +312,13 @@
                 }
 
                 else if (val.startsWith("DICA")) {
-                    if (val.includes("1")) print("DICA: Uma é apenas a Luz que nasce no Nada, um vazio.", "text-purple");
-                    if (val.includes("2")) print("DICA: No final, ao habitar um corpo que não é seu, você é apenas uma...", "text-purple");
+                    if (val.includes("1")) print("DICA: Uma é apenas a Luz que nasce no Nada, um vazio, voce habita no....", "text-purple");
+                    if (val.includes("2")) print("DICA: No final, ao habitar um corpo que não é seu, sobra apenas a....", "text-purple");
                     if (val.includes("3")) print("DICA: No Labirinto do guerreiro, o ultimo circulo necessário nasce, pois é impossivel ganhar do minotauro sem...", "text-purple");
                 }
 
                 else if (val.startsWith("VINCULAR")) {
-                    if (val === "VINCULAR SONHO LIMBO" || val === "VINCULAR DIRETORA FRAUDE" || val === "VINCULAR PRISIONEIRA VIOLENCIA") {
+                    if (val === "VINCULAR SONHO LIMBO" || val === "VINCULAR DIRETORA VIOLENCIA" || val === "VINCULAR PRISIONEIRA IRA") {
                         print("FRAGMENTO ESTABILIZADO.", "text-gold");
                         vinculados++;
                         let p = 10 + (vinculados * 13);
