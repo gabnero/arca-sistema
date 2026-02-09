@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A.R.C.A. Dashboard v3.0</title>
+    <style>
+        :root {
+            --neon-purple: #8a2be2;
+            --neon-gold: #ffd700;
+            --bg-dark: #0a0a0c;
+            --panel-bg: rgba(20, 20, 25, 0.8);
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #e0e0e0;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 300px 1fr 300px;
+            grid-template-rows: 60px 1fr 200px;
+            height: 100vh;
+            gap: 10px;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        /* Efeito de scanline de TV antiga */
+        body::before {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 100;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+
+        header {
+            grid-column: 1 / 4;
+            background: var(--panel-bg);
+            border: 1px solid var(--neon-purple);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            justify-content: space-between;
+            text-shadow: 0 0 10px var(--neon-purple);
+        }
+
+        .panel {
+            background: var(--panel-bg);
+            border: 1px solid rgba(138, 43, 226, 0.3);
+            padding: 15px;
+            overflow-y: auto;
+            backdrop-filter: blur(5px);
+        }
+
+        /* Monitor de Alma (51/49) */
+        .soul-bar-container { margin-bottom: 20px; }
+        .soul-label { font-size: 12px; margin-bottom: 5px; display: block; }
+        .bar-bg { background: #222; height: 15px; border-radius: 10px; overflow: hidden; }
+        .bar-fill { height: 100%; transition: width 2s; }
+        .queen { background: var(--neon-purple); box-shadow: 0 0 10px var(--neon-purple); }
+        .fragments { background: var(--neon-gold); box-shadow: 0 0 10px var(--neon-gold); }
+
+        /* Mapa Estelar Central */
+        #star-map {
+            grid-column: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--neon-purple);
+            position: relative;
+        }
+
+        canvas { width: 100%; height: 100%; cursor: crosshair; }
+
+        /* Terminal Inferior */
+        #terminal {
+            grid-column: 1 / 4;
+            background: #000;
+            border: 1px solid var(--neon-purple);
+            padding: 10px;
+            font-size: 14px;
+            color: #00ff41;
+        }
+
+        #output { height: 130px; overflow-y: auto; margin-bottom: 5px; }
+        input {
+            background: transparent;
+            border: none;
+            color: #00ff41;
+            width: 90%;
+            outline: none;
+            font-family: inherit;
+        }
+
+        .highlight { color: var(--neon-gold); }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div>SISTEMA A.R.C.A. v3.0 [ONLINE]</div>
+        <div id="clock">09/02/2026 | 11:00:27</div>
+        <div style="color: var(--neon-gold);">STATUS: MEMBRANA INSTÁVEL</div>
+    </header>
+
+    <aside class="panel">
+        <h3>INTEGRIDADE DE ALICE</h3>
+        <div class="soul-bar-container">
+            <span class="soul-label">RAINHA DEMONÍACA (51%)</span>
+            <div class="bar-bg"><div class="bar-fill queen" style="width: 51%;"></div></div>
+        </div>
+        <div class="soul-bar-container">
+            <span class="soul-label">FRAGMENTOS RESTANTES (49%)</span>
+            <div class="bar-bg"><div class="bar-fill fragments" style="width: 10%;"></div></div>
+        </div>
+        <hr style="border: 0.5px solid #333;">
+        <h4>FRAGMENTOS DETECTADOS</h4>
+        <ul style="font-size: 12px; list-style: none; padding: 0;">
+            <li class="highlight">[ ] SONHO MAIS ANTIGO</li>
+            <li>[ ] DIRETORA DO FALSO ATO</li>
+            <li>[ ] PRISIONEIRA DA BANDANA</li>
+        </ul>
+    </aside>
+
+    <main id="star-map">
+        <div style="position: absolute; top: 10px; left: 10px; font-size: 10px;">VISUALIZADOR ESTELAR - SETOR 01</div>
+        <canvas id="canvasStars"></canvas>
+    </main>
+
+    <aside class="panel">
+        <h3>LOGS GLOBAIS</h3>
+        <div id="logs" style="font-size: 11px; line-height: 1.6;">
+            <p>[14-MAY-2021] Falha elétrica massiva detectada em Natal-RN.</p>
+            <p>[10-FEB-2026] Sincronia de 'Marca' detectada no Miro.</p>
+            <p style="color: red;">[ERROR] A DIRETORA bloqueou o acesso ao Pilar 9.</p>
+        </div>
+    </aside>
+
+    <footer id="terminal">
+        <div id="output"></div>
+        <span>> </span><input type="text" id="commandInput" autofocus autocomplete="off">
+    </footer>
+
+    <script>
+        // Lógica do Relógio
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('clock').innerText = now.toLocaleString();
+        }, 1000);
+
+        // Lógica do Mapa Estelar (Canvas)
+        const canvas = document.getElementById('canvasStars');
+        const ctx = canvas.getContext('2d');
+        let stars = [];
+
+        function initStars() {
+            canvas.width = canvas.parentElement.offsetWidth;
+            canvas.height = canvas.parentElement.offsetHeight;
+            for(let i=0; i<100; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 2,
+                    opacity: Math.random()
+                });
+            }
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "white";
+            stars.forEach(s => {
+                ctx.globalAlpha = s.opacity;
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, s.size, 0, Math.PI*2);
+                ctx.fill();
+            });
+            requestAnimationFrame(draw);
+        }
+        initStars();
+        draw();
+
+        // Lógica do Terminal
+        const output = document.getElementById('output');
+        const input = document.getElementById('commandInput');
+
+        const print = (txt, color = "#00ff41") => {
+            const p = document.createElement('p');
+            p.style.color = color;
+            p.innerHTML = txt;
+            output.appendChild(p);
+            output.scrollTop = output.scrollHeight;
+        };
+
+        print("A.R.C.A. v3.0 inicializado. Digite 'HELP' para comandos.");
+
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const cmd = input.value.toUpperCase();
+                print("> " + cmd, "white");
+                input.value = "";
+
+                switch(cmd) {
+                    case "HELP":
+                        print("Comandos: LS, ANALISAR, RITUAL, CLEAR");
+                        break;
+                    case "LS":
+                        print("ARQUIVOS: frag_sonho.dna, pilar_9.lock, carcosa.map");
+                        break;
+                    case "RITUAL":
+                        print("ERRO: Escolha 'ARROGÂNCIA' detectada. Sincronia falhou.", "red");
+                        break;
+                    case "ANALISAR":
+                        print("Estrelas em 14/05/2021: ALINHAMENTO DE TRAIÇÃO DETECTADO.");
+                        break;
+                    case "CLEAR":
+                        output.innerHTML = "";
+                        break;
+                    default:
+                        print("Comando desconhecido.");
+                }
+            }
+        });
+    </script>
+</body>
+</html>
