@@ -44,7 +44,7 @@
         }
         body::after {
             content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle, rgba(0,0,0,0) 60%, rgba(0,0,0,0.8) 100%);
+            background: radial-gradient(circle, rgba(0,0,0,0) 60%, rgba(0,0,0,0.6) 100%);
             pointer-events: none; z-index: 900;
         }
 
@@ -148,14 +148,13 @@
             font-size: 24px; color: #888; margin-top: 10px;
             letter-spacing: 3px; border-top: 1px solid #333; padding-top: 10px;
         }
+        /* MODIFICAÇÃO: Símbolo ocultista agora usa a imagem desconjuração.jpg */
         .occult-symbol {
             position: absolute; width: 600px; height: 600px;
-            border: 1px dashed rgba(255, 0, 0, 0.2); border-radius: 50%;
+            background: url('desconjuração.jpg') no-repeat center center;
+            background-size: contain;
+            opacity: 0.15;
             animation: spin 20s linear infinite; pointer-events: none;
-        }
-        .occult-symbol::before {
-            content: ""; position: absolute; top: 10%; left: 10%; width: 80%; height: 80%;
-            border: 1px solid rgba(255, 0, 0, 0.1); transform: rotate(45deg);
         }
 
         @keyframes pulse-title { 0%, 100% { opacity: 1; } 50% { opacity: 0.8; text-shadow: 0 0 10px #500; } }
@@ -351,7 +350,7 @@
                     else {
                         print("O SELO FOI ROMPIDO. O TRONO CAIU.", "text-green");
                         print("ARQUIVO DE IDENTIDADE DESBLOQUEADO:", "text-gold");
-                        print("<span style='background:#333; color:#fff; padding:2px;'>cnMgaG1lIGhzIHdtcnMsIGlwaSB4bXZzeSB4eWhzIGhpIHFtcS4KZXMgeXdldiBzIHZteHllcCBoaSAieHZzZ2UgaGkgaGl3eG1ycyIgcsOjcyBldGlyZXcgeHNxc3kgcWl5IGdzdnRzLiBpcGkgeHNxc3kgeHNoZSBlIHFtcmxlIHptaGUsIGkgcW1ybGUgcWlyeGkgam1nc3kgdHZpd2UgaXEgd2l5IGdzdnRzLgpxZXcsIGl5IHhtemksIHJzdyBxaXl3IHlweG1xc3cgdmlwZXR3c3csIGlydXllcnhzIGV3IHFtcmxldyBsbXd4w7N2bWV3IGl2ZXEganZla3FpcnhlaGV3LCBpeSB4bXppIHlxIHZpcGV0d3MuIGl5IGd2bWltIGUgInFtcmxlIGptcGxlIiBpIGUgInR2bXdtc3JpbXZlIi4gZSAidHZtd21zcmltdmUiIHplbSBlZ3lxeXBldiBqc3bDp2UgZXJ4aXcgaGkgcWkgcG1maXZ4ZXYsIGkgZSAiam1wbGUiIHplbSBreW1ldiBpcGl3IGV4w6kgcW1xLi4gcWV3IGl3d2Ugw6kgeXFlIHN5eHZlIGxtd3jDs3ZtZS4gdHN2IHh2w6F3IGhlIHHDoXdnZXZlIHRlcG1oZSwgw6kgaXBpLiBldXlpcGkgdXlpIHlxIGhtZSBpeSBnbGVxaW0gaGkgbXZxw6NzLiBpcGkgw6kgZSBobXZpeHN2ZS4KCmUgaG12aXhzdmUsIHMgd3NybHMsIGkgZSB0dm13bXNyaW12ZSwgZW1yaGUgdml0dml3aXJ4ZXEgd8OzIDQ5JSBoaSBxbXEuIGl5IGVtcmhlIHdzeSBlIHFlbXN2IHRldnhpLi4gcWV3IHdpIGl5IHR2aWdtd2V2IGl3Z3NwbGl2IHlxZSBsbXd4w7N2bWUgaSB5cSBpd3hta3FlIHRldmUgcWkgd2lreXZldiByZSBxbXJsZSBxbXdpdmUgaSBqdmVnZSBpYm13eGlyZ21lIGVrc3ZlPwppeSB3c3kgZSAidmVtcmxlIGhpcXNybWVnZSBoZSB3ZXB6ZcOnw6NzIi4gaXkgd3N5IGV1eWlwZSB1eWkgdHN2eGUgcyAidHNyeHMgaGkgem13eGUgc3Jtd2dtaXJ4aSIu</span>", "text-green");
+                        print("<span style='background:#333; color:#fff; padding:2px;'>cnMgaG1lIGhzIHdtcnMsIGlwaSB4bXZzeSB4eWhzIGhpIHFtcS4KZXMgeXdldiBzIHZteHllcCBoaSAieHZzZ2UgaGkgaGl3eG1ycyIgcsOjcyBldGlyZXcgeHNxc3kgcWl5IGdzdnRzLiBpcGkgeHNxc3kgeHNoZSBlIHFtcmxlIHptaGUsIGkgcW1ybGUgcWlyeGkgam1nc3kgdHZpd2UgaXEgd2l5IGdzdnRzLgpxZXcsIGl5IHhtemksIHJzdyBxaXl3IHlweG1xc3wgdmlwZXR3c3csIGlydXllcnhzIGV3IHFtcmxldyBsbXd4w7N2bWV3IGl2ZXEganZla3FpcnhlaGV3LCBpeSB4bXppIHlxIHZpcGV0d3MuIGl5IGd2bWltIGUgInFtcmxlIGptcGxlIiBpIGUgInR2bXdtc3JpbXZlIi4gZSAidHZtd21zcmltdmUiIHplbSBlZ3lxeXBldiBqc3bDp2UgZXJ4aXcgaGkgcWkgcG1maXZ4ZXYsIGkgZSAiam1wbGUiIHplbSBreW1ldiBpcGl3IGV4w6kgcW1xLi4gcWV3IGl3d2Ugw6kgeXFlIHN5eHZlIGxtd3jDs3ZtZS4gdHN2IHh2w6F3IGhlIHHDoXdnZXZlIHRlcG1oZSwgw6kgaXBpLiBldXlpcGkgdXlpIHlxIGhtZSBpeSBnbGVxaW0gaGkgbXZxw6NzLiBpcGkgw6kgZSBobXZpeHN2ZS4KCmUgaG12aXhzdmUsIHMgd3NybHMsIGkgZSB0dm13bXNyaW12ZSwgZW1yaGUgdml0dml3aXJ4ZXEgd8OzIDQ5JSBoaSBxbXEuIGl5IGVtcmhlIHdzeSBlIHFlbXN2IHRldnhpLi4gcWV3IHdpIGl5IHR2aWdtd2V2IGl3Z3NwbGl2IHlxZSBsbXd4w7N2bWUgaSB5cSBpd3hta3FlIHRldmUgcWkgd2lreXZldiByZSBxbXJsZSBxbXdpdmUgaSBqdmVnZSBpYm13eGlyZ21lIGVrc3ZlPwppeSB3c3kgZSAidmVtcmxlIGhpcXNybWVnZSBoZSB3ZXB6ZcOnw6NzIi4gaXkgd3N5IGV1eWlwZSB1eWkgdHN2eGUgcyAidHNyeHMgaGkgem13eGUgc3Jtd2dtaXJ4aSIu</span>", "text-green");
                         print("DECODIFIQUE PARA IDENTIFICAR AQUELE QUE TRAI A IRMANDADE. (USE O PROTOCOLO DE ACUSAÇÃO)", "text-purple");
                         updateTask('task3', 'task4');
                     }
